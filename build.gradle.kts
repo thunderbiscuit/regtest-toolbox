@@ -1,6 +1,7 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.3.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
+    id("org.gradle.maven-publish")
 }
 
 group = "org.kotlinbitcointools"
@@ -37,5 +38,43 @@ tasks.test {
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            from(components["java"])
+        }
+    }
+
+    publications.named<MavenPublication>("release") {
+        this.groupId = project.group.toString()
+        this.artifactId = project.name
+        this.version = project.version.toString()
+
+        pom {
+            name.set("regtest-toolbox")
+            description.set("A set of tools for the regtest connoisseur.")
+            url.set("https://github.com/kotlin-bitcoin-tools")
+            licenses {
+                license {
+                    name.set("The Apache License, Version 2.0")
+                    url.set("https://github.com/kotlin-bitcoin-tools/regtest-toolbox/blob/master/LICENSE.txt")
+                }
+            }
+            developers {
+                developer {
+                    id.set("thunderbiscuit")
+                    name.set("thunderbiscuit")
+                    email.set("thunderbiscuit@protonmail.com")
+                }
+            }
+            scm {
+                connection.set("scm:git:https://github.com:kotlin-bitcoin-tools/regtest-toolbox.git")
+                developerConnection.set("scm:git:git@github.com:kotlin-bitcoin-tools/regtest-toolbox.git")
+                url.set("https://github.com/kotlin-bitcoin-tools/regtest-toolbox")
+            }
+        }
     }
 }
