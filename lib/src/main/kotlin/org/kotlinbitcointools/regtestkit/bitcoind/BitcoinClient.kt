@@ -49,6 +49,22 @@ class BitcoinClient(
         return rpcResponse.result ?: throw Exception("Failed to generate blocks: ${rpcResponse.error}")
     }
 
+    suspend fun getBlockCount(): BlockHeight {
+        val request = RpcRequest(
+            method = "getblockcount",
+            params = emptyList()
+        )
+
+        val response = client.post(baseUrl) {
+            contentType(ContentType.Application.Json)
+            basicAuth(username, password)
+            setBody(request)
+        }
+
+        val rpcResponse: RpcResponse<BlockHeight> = response.body()
+        return rpcResponse.result ?: throw Exception("Failed to get block count: ${rpcResponse.error}")
+    }
+
     fun close() {
         client.close()
     }

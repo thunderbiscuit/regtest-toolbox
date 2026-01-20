@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.kotlinbitcointools.regtestkit.bitcoind.BitcoinClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class BitcoinClientTest {
     @Test
@@ -25,6 +26,24 @@ class BitcoinClientTest {
             }
 
             assertEquals(blockHashes.size, 3, "Should generate 3 blocks")
+        } finally {
+            client.close()
+        }
+    }
+
+    @Test
+    fun testGetBlockCount() = runBlocking {
+        val client = BitcoinClient(
+            host = "localhost",
+            port = 18443,
+            username = "regtest",
+            password = "password"
+        )
+
+        try {
+            val blockCount = client.getBlockCount()
+            println("Current block count: $blockCount")
+            assertTrue(blockCount >= 0, "Block count should be non-negative")
         } finally {
             client.close()
         }
