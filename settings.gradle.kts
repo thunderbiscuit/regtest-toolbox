@@ -1,2 +1,2 @@
-rootProject.name = "regtest-kit"
+rootProject.name = "regtest-toolbox"
 include("lib")
