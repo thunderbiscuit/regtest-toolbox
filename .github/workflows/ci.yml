@@ -1,0 +1,40 @@
+name: Run Tests
+
+# This workflow runs all tests using the Podman Regtest Infinity Pro image
+# https://github.com/thunderbiscuit/podman-regtest-infinity-pro
+
+on: [workflow_dispatch, push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+
+    services:
+      bitcoin-regtest:
+        image: ghcr.io/thunderbiscuit/podman-regtest-infinity-pro:0.3.1
+        ports:
+          - 18443:18443
+          - 18444:18444
+          - 3002:3002
+          - 3003:3003
+          - 60401:60401
+        # The container initialization step will wait until everything is ready before allowing other steps to run
+        options: >-
+          --health-cmd "test $(bitcoin-cli -regtest -rpcuser=regtest -rpcpassword=password getblockcount) -gt 0"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 6
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Run Tests
+        run: ./gradlew test
