@@ -1,6 +1,9 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.1.10"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.10"
+    id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
     id("org.gradle.maven-publish")
 }
 
@@ -68,5 +71,13 @@ publishing {
                 url.set("https://github.com/kotlin-bitcoin-tools/regtest-toolbox")
             }
         }
+    }
+}
+
+ktlint {
+    version = "1.8.0"
+    ignoreFailures = false
+    reporters {
+        reporter(ReporterType.PLAIN).apply { outputToConsole = true }
     }
 }
