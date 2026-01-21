@@ -22,14 +22,16 @@ class BitcoinClient(
     host: String = "localhost",
     port: Int = 18443,
     private val username: String,
-    private val password: String
+    private val password: String,
 ) {
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = false
-                isLenient = false
-            })
+            json(
+                Json {
+                    ignoreUnknownKeys = false
+                    isLenient = false
+                }
+            )
         }
     }
 

@@ -13,18 +13,18 @@ data class RpcRequest(
     val jsonrpc: String = "1.0",
     val id: String = "kotlin-client",
     val method: String,
-    val params: List<JsonElement>
+    val params: List<JsonElement>,
 )
 
 @Serializable
 data class RpcResponse<T>(
     val result: T? = null,
     val error: RpcError? = null,
-    val id: String? = null
+    val id: String? = null,
 )
 
 @Serializable
 data class RpcError(
     val code: Int,
-    val message: String
+    val message: String,
 )

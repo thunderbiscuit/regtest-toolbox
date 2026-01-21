@@ -13,44 +13,48 @@ import kotlin.test.assertTrue
 
 class BitcoinClientTest {
     @Test
-    fun testGenerateBlocks() = runBlocking {
-        val client = BitcoinClient(
-            host = "localhost",
-            port = 18443,
-            username = "regtest",
-            password = "password"
-        )
+    fun testGenerateBlocks() {
+        runBlocking {
+            val client = BitcoinClient(
+                host = "localhost",
+                port = 18443,
+                username = "regtest",
+                password = "password"
+            )
 
-        try {
-            val address = "bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq"
-            val blockHashes = client.generateBlocks(3, address)
+            try {
+                val address = "bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq"
+                val blockHashes = client.generateBlocks(3, address)
 
-            println("Generated ${blockHashes.size} blocks")
-            blockHashes.forEach { hash ->
-                println("Block hash: $hash")
+                println("Generated ${blockHashes.size} blocks")
+                blockHashes.forEach { hash ->
+                    println("Block hash: $hash")
+                }
+
+                assertEquals(blockHashes.size, 3, "Should generate 3 blocks")
+            } finally {
+                client.close()
             }
-
-            assertEquals(blockHashes.size, 3, "Should generate 3 blocks")
-        } finally {
-            client.close()
         }
     }
 
     @Test
-    fun testGetBlockCount() = runBlocking {
-        val client = BitcoinClient(
-            host = "localhost",
-            port = 18443,
-            username = "regtest",
-            password = "password"
-        )
+    fun testGetBlockCount() {
+        runBlocking {
+            val client = BitcoinClient(
+                host = "localhost",
+                port = 18443,
+                username = "regtest",
+                password = "password"
+            )
 
-        try {
-            val blockCount = client.getBlockCount()
-            println("Current block count: $blockCount")
-            assertTrue(blockCount >= 0, "Block count should be non-negative")
-        } finally {
-            client.close()
+            try {
+                val blockCount = client.getBlockCount()
+                println("Current block count: $blockCount")
+                assertTrue(blockCount >= 0, "Block count should be non-negative")
+            } finally {
+                client.close()
+            }
         }
     }
 }
