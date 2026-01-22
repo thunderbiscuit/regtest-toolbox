@@ -3,10 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the ./LICENSE.txt file.
  */
 
-package org.kotlinbitcointools.regtestkit
+package org.kotlinbitcointools.regtesttoolbox
 
 import kotlinx.coroutines.runBlocking
-import org.kotlinbitcointools.regtestkit.bitcoind.BitcoinClient
+import org.kotlinbitcointools.regtesttoolbox.bitcoind.BitcoinClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
