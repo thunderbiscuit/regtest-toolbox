@@ -63,19 +63,6 @@ class BitcoinClientTest {
         runBlocking {
             // Create a wallet with a unique name
             val walletName = "testwallet_${System.currentTimeMillis()}"
-            //
-            // val client = BitcoinClient(
-            //     host = "localhost",
-            //     port = 18443,
-            //     username = "regtest",
-            //     password = "password",
-            //     walletName = walletName,
-            // )
-            //
-            // val walletResponse = client.createWallet(walletName)
-            // println("Created wallet: ${walletResponse.name}")
-            // assertEquals(walletName, walletResponse.name, "Wallet name should match")
-            // client.close()
 
             // Create a wallet-specific client for wallet operations
             val walletClient = BitcoinClient(
@@ -169,8 +156,8 @@ class BitcoinClientTest {
                 // Send coins with a specific fee rate (4.0 sat/vB)
                 val recipientAddress = "bcrt1q6gau5mg4ceupfhtyywyaj5ge45vgptvawgg3aq"
                 val feeRate = 4.0
-                val txid = client.send(recipientAddress, 1.0, feeRate)
-                println("Sent 1.0 BTC with fee rate $feeRate sat/vB, txid: $txid")
+                val txid = client.send(recipientAddress, 0.00012345, feeRate)
+                println("Sent 0.00012345 BTC with fee rate $feeRate sat/vB, txid: $txid")
                 assertTrue(txid.isNotEmpty())
                 assertEquals(64, txid.length, "Txid should be 64 hex characters")
             } finally {
