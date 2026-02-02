@@ -1,9 +1,16 @@
+[doc("Default command; list all available commands.")]
+@list:
+  just --list --unsorted
+
+[doc("Build the library.")]
 build:
   ./gradlew build
 
-test:
-  ./gradlew test
+[doc("Run all tests, unless a specific test is provided.")]
+test *TEST:
+  ./gradlew test {{ if TEST == "" { "" } else { "--tests " + TEST } }}
 
+[doc("Publish the library to local Maven repository.")]
 publish-local:
   ./gradlew publishToMavenLocal
 
