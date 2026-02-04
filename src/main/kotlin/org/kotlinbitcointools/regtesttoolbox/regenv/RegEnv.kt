@@ -9,15 +9,24 @@ import org.kotlinbitcointools.regtesttoolbox.bitcoind.Utxo
  *
  * Example usage:
  * ```kotlin
- * val env = RegEnv.create(username = "regtest", password = "password", funded = true)
+ * // Connect to a pre-funded faucet wallet
+ * val faucet = RegEnv.connectTo(walletName = "faucet", username = "regtest", password = "password")
+ *
+ * // Create a new wallet and fund it from the faucet
+ * val env = RegEnv.create(username = "regtest", password = "password")
+ * val address = env.getNewAddress()
+ * faucet.send(address, 50.0)
+ * faucet.mine(1)  // Confirm the funding transaction
+ *
+ * // Now env has spendable funds
  * val txid = env.send("bcrt1q...", 1.0)
- * env.mine(1)  // Confirm the transaction (rewards go to burn address)
+ * env.mine(1)
  * env.close()
+ * faucet.close()
  * ```
  */
 class RegEnv private constructor(
     private val client: BitcoinClient,
-    val walletName: String,
 ) {
     private val burnAddress: String = BURN_ADDRESS
 
@@ -109,7 +118,6 @@ class RegEnv private constructor(
          * @param username RPC username
          * @param password RPC password
          * @param walletName Optional wallet name (auto-generated if not provided)
-         * @param funded If true, mines 101 blocks to fund the wallet with spendable bitcoin (default: false)
          * @return A new RegEnv instance with wallet created
          */
         suspend fun create(
@@ -118,7 +126,6 @@ class RegEnv private constructor(
             username: String,
             password: String,
             walletName: String = "regenv_${System.currentTimeMillis()}",
-            funded: Boolean = false,
         ): RegEnv {
             // First create the wallet using a client without wallet path
             val setupClient = BitcoinClient(
@@ -144,14 +151,38 @@ class RegEnv private constructor(
                 walletName = walletName,
             )
 
-            if (funded) {
-                // Fund the wallet: mine 1 block to the wallet, then 100 more to mature the coinbase
-                val address = walletClient.getNewAddress()
-                walletClient.generateBlocks(1, address)
-                walletClient.generateBlocks(100, BURN_ADDRESS)
-            }
+            return RegEnv(walletClient)
+        }
 
-            return RegEnv(walletClient, walletName)
+        /**
+         * Connect to an existing wallet.
+         *
+         * Use this to connect to a pre-funded wallet (e.g., a faucet) or any wallet
+         * that already exists on the node.
+         *
+         * @param host Bitcoin Core RPC host (default: localhost)
+         * @param port Bitcoin Core RPC port (default: 18443 for regtest)
+         * @param username RPC username
+         * @param password RPC password
+         * @param walletName Name of the existing wallet to connect to
+         * @return A new RegEnv instance connected to the existing wallet
+         */
+        fun connectTo(
+            host: String = "localhost",
+            port: Int = 18443,
+            username: String,
+            password: String,
+            walletName: String,
+        ): RegEnv {
+            val walletClient = BitcoinClient(
+                host = host,
+                port = port,
+                username = username,
+                password = password,
+                walletName = walletName,
+            )
+
+            return RegEnv(walletClient)
         }
     }
 }
