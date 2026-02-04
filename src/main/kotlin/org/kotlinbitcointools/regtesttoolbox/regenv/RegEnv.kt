@@ -9,9 +9,7 @@ import org.kotlinbitcointools.regtesttoolbox.bitcoind.Utxo
  *
  * Example usage:
  * ```kotlin
- * val env = RegEnv.create(username = "regtest", password = "password")
- * val address = env.getNewAddress()
- * env.mineToAddress(101, address)  // Fund the wallet (101 blocks for maturity)
+ * val env = RegEnv.create(username = "regtest", password = "password", funded = true)
  * val txid = env.send("bcrt1q...", 1.0)
  * env.mine(1)  // Confirm the transaction (rewards go to burn address)
  * env.close()
@@ -21,7 +19,7 @@ class RegEnv private constructor(
     private val client: BitcoinClient,
     val walletName: String,
 ) {
-    private var burnAddress: String = "bcrt1q000regtest000regtest000regtest000ferjz"
+    private val burnAddress: String = BURN_ADDRESS
 
     /**
      * Mine blocks to a burn address (no wallet receives the coinbase rewards).
@@ -101,6 +99,8 @@ class RegEnv private constructor(
     }
 
     companion object {
+        private const val BURN_ADDRESS = "bcrt1q000regtest000regtest000regtest000ferjz"
+
         /**
          * Create a new RegEnv with an auto-generated wallet.
          *
@@ -109,6 +109,7 @@ class RegEnv private constructor(
          * @param username RPC username
          * @param password RPC password
          * @param walletName Optional wallet name (auto-generated if not provided)
+         * @param funded If true, mines 101 blocks to fund the wallet with spendable bitcoin (default: false)
          * @return A new RegEnv instance with wallet created
          */
         suspend fun create(
@@ -117,6 +118,7 @@ class RegEnv private constructor(
             username: String,
             password: String,
             walletName: String = "regenv_${System.currentTimeMillis()}",
+            funded: Boolean = false,
         ): RegEnv {
             // First create the wallet using a client without wallet path
             val setupClient = BitcoinClient(
@@ -141,6 +143,13 @@ class RegEnv private constructor(
                 password = password,
                 walletName = walletName,
             )
+
+            if (funded) {
+                // Fund the wallet: mine 1 block to the wallet, then 100 more to mature the coinbase
+                val address = walletClient.getNewAddress()
+                walletClient.generateBlocks(1, address)
+                walletClient.generateBlocks(100, BURN_ADDRESS)
+            }
 
             return RegEnv(walletClient, walletName)
         }

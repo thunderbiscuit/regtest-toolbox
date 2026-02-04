@@ -39,3 +39,23 @@ val blockCount: Int = client.getBlockCount()
 
 client.close()
 ```
+
+## Regtest Block Rewards
+
+On regtest, the block subsidy halves every 150 blocks (compared to 210,000 on mainnet). If your regtest chain is too long, coinbase rewards may be negligible or zero.
+
+| Block Height | Block Reward |
+|--------------|--------------|
+| 0-149        | 50 BTC       |
+| 150-299      | 25 BTC       |
+| 300-449      | 12.5 BTC     |
+| 450-599      | 6.25 BTC     |
+| 600-749      | 3.125 BTC    |
+| 750-899      | 1.5625 BTC   |
+| 900-1049     | 0.78125 BTC  |
+| 1050-1199    | 0.390625 BTC |
+| 1200-1349    | 0.195 BTC    |
+| 1350-1499    | 0.0977 BTC   |
+| 1500+        | < 0.05 BTC   |
+
+After ~3000 blocks (20 halvings), rewards are less than 1 satoshi.

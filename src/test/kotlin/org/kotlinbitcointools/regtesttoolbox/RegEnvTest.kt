@@ -32,42 +32,33 @@ class RegEnvTest {
     @Test
     fun testGetNewAddressAndSend() {
         runBlocking {
-            val env = RegEnv.create(username = "regtest", password = "password")
+            val sender = RegEnv.create(username = "regtest", password = "password", funded = true)
+            val receiver = RegEnv.create(username = "regtest", password = "password")
 
             try {
-                // Get an address from the wallet
-                val address = env.getNewAddress()
-                assertTrue(address.isNotEmpty(), "Address should not be empty")
-                assertTrue(address.startsWith("bcrt1"), "Should be a regtest bech32 address")
+                // Wallet is auto-funded, verify balance
+                val senderBalance = sender.getBalance()
+                assertTrue(senderBalance > 0.0, "Sender should have auto-funded balance")
 
-                // Mine blocks to an external address, then send to our wallet
-                // First we need funds in the wallet, so let's use a second env to fund this one
-                val funder = RegEnv.create(username = "regtest", password = "password")
+                // Get a receiving address
+                val receiverAddress = receiver.getNewAddress()
+                assertTrue(receiverAddress.isNotEmpty(), "Address should not be empty")
+                assertTrue(receiverAddress.startsWith("bcrt1"), "Should be a regtest bech32 address")
 
-                try {
-                    // Fund the funder wallet by mining to its own address
-                    val funderAddress = funder.getNewAddress()
-                    funder.mineToAddress(101, funderAddress)
+                // Send funds
+                val txid = sender.send(receiverAddress, 1.0)
+                assertTrue(txid.isNotEmpty(), "Transaction ID should not be empty")
+                assertEquals(64, txid.length, "Txid should be 64 hex characters")
 
-                    val funderBalance = funder.getBalance()
-                    assertTrue(funderBalance > 0, "Funder should have balance after mining")
+                // Mine a block to confirm
+                sender.mine(1)
 
-                    // Send from funder to env
-                    val txid = funder.send(address, 0.00012345)
-                    assertTrue(txid.isNotEmpty(), "Transaction ID should not be empty")
-                    assertEquals(64, txid.length, "Txid should be 64 hex characters")
-
-                    // Mine a block to confirm
-                    funder.mine(1)
-
-                    // Check that env received the funds
-                    val envBalance = env.getBalance()
-                    assertTrue(envBalance >= 0.00012345, "Env should have received funds")
-                } finally {
-                    funder.close()
-                }
+                // Check that receiver got the funds
+                val receiverBalance = receiver.getBalance()
+                assertTrue(receiverBalance >= 1.0, "Receiver should have received funds")
             } finally {
-                env.close()
+                sender.close()
+                receiver.close()
             }
         }
     }
@@ -75,16 +66,16 @@ class RegEnvTest {
     @Test
     fun testGetBalances() {
         runBlocking {
-            val env = RegEnv.create(username = "regtest", password = "password")
+            val env = RegEnv.create(username = "regtest", password = "password", funded = true)
 
             try {
                 val balances = env.getBalances()
 
-                // On a fresh wallet, all balances should be 0
-                assertTrue(balances.mine.trusted >= 0, "Trusted balance should be non-negative")
+                // Wallet is auto-funded with some BTC (1 mature coinbase reward)
+                assertTrue(balances.mine.trusted > 0.0, "Trusted balance should include coinbase reward")
                 assertTrue(balances.mine.immature >= 0, "Immature balance should be non-negative")
                 assertTrue(balances.mine.untrusted_pending >= 0, "Pending balance should be non-negative")
-                assertTrue(balances.lastprocessedblock.height >= 0, "Block height should be non-negative")
+                assertTrue(balances.lastprocessedblock.height >= 101, "Block height should be at least 101")
             } finally {
                 env.close()
             }
@@ -94,12 +85,13 @@ class RegEnvTest {
     @Test
     fun testListUnspent() {
         runBlocking {
-            val env = RegEnv.create(username = "regtest", password = "password")
+            val env = RegEnv.create(username = "regtest", password = "password", funded = true)
 
             try {
-                // Fresh wallet should have no UTXOs
+                // Wallet is auto-funded with 1 coinbase UTXO
                 val utxos = env.listUnspent()
-                assertTrue(utxos.isEmpty(), "Fresh wallet should have no UTXOs")
+                assertTrue(utxos.isNotEmpty(), "Wallet should have at least one UTXO from auto-funding")
+                assertTrue(utxos[0].amount > 0.0, "Coinbase UTXO should be at least 50 BTC")
             } finally {
                 env.close()
             }
