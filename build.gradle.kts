@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "2.3.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
-    id("org.gradle.maven-publish")
+    id("com.vanniktech.maven.publish") version "0.36.0"
 }
 
 group = "org.kotlinbitcointools"
@@ -36,42 +36,43 @@ java {
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("release") {
-            from(components["java"])
-        }
-    }
+mavenPublishing {
+    coordinates(
+        groupId = group.toString(),
+        artifactId = "regtest-toolbox",
+        version = version.toString()
+    )
 
-    publications.named<MavenPublication>("release") {
-        this.groupId = project.group.toString()
-        this.artifactId = project.name
-        this.version = project.version.toString()
-
-        pom {
-            name.set("regtest-toolbox")
-            description.set("A set of tools for the regtest connoisseur.")
-            url.set("https://github.com/kotlin-bitcoin-tools")
-            licenses {
-                license {
-                    name.set("The Apache License, Version 2.0")
-                    url.set("https://github.com/kotlin-bitcoin-tools/regtest-toolbox/blob/master/LICENSE.txt")
-                }
-            }
-            developers {
-                developer {
-                    id.set("thunderbiscuit")
-                    name.set("thunderbiscuit")
-                    email.set("thunderbiscuit@protonmail.com")
-                }
-            }
-            scm {
-                connection.set("scm:git:https://github.com:kotlin-bitcoin-tools/regtest-toolbox.git")
-                developerConnection.set("scm:git:git@github.com:kotlin-bitcoin-tools/regtest-toolbox.git")
-                url.set("https://github.com/kotlin-bitcoin-tools/regtest-toolbox")
+    pom {
+        name.set("regtest-toolbox")
+        description.set("A set of tools for the regtest connoisseur.")
+        inceptionYear.set("2026")
+        url.set("https://github.com/thunderbiscuit/regtest-toolbox")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("repo")
             }
         }
+        developers {
+            developer {
+                id.set("thunderbiscuit")
+                name.set("thunderbiscuit")
+                url.set("https://github.com/thunderbiscuit")
+            }
+        }
+        scm {
+            url.set("https://github.com/thunderbiscuit/regtest-toolbox")
+            connection.set("scm:git:git://github.com/thunderbiscuit/regtest-toolbox.git")
+            developerConnection.set("scm:git:ssh://git@github.com/thunderbiscuit/regtest-toolbox.git")
+        }
     }
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
 }
 
 ktlint {
