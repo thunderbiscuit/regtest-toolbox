@@ -1,8 +1,8 @@
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.1.10"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.10"
+    id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
     id("org.gradle.maven-publish")
 }
