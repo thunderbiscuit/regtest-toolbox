@@ -15,13 +15,15 @@ repositories {
 }
 
 dependencies {
+    // Ktor
     implementation("io.ktor:ktor-client-core:3.3.3")
     implementation("io.ktor:ktor-client-cio:3.3.3")
     implementation("io.ktor:ktor-client-content-negotiation:3.3.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test:2.1.10")
+    // Tests
+    testImplementation(kotlin("test"))
 }
 
 tasks.test {
@@ -47,7 +49,7 @@ mavenPublishing {
         name.set("regtest-toolbox")
         description.set("A set of tools for the regtest connoisseur.")
         inceptionYear.set("2026")
-        url.set("https://github.com/thunderbiscuit/regtest-toolbox")
+        url.set("https://github.com/kotlin-bitcoin-tools/regtest-toolbox")
         licenses {
             license {
                 name.set("The Apache License, Version 2.0")
@@ -63,9 +65,9 @@ mavenPublishing {
             }
         }
         scm {
-            url.set("https://github.com/thunderbiscuit/regtest-toolbox")
-            connection.set("scm:git:git://github.com/thunderbiscuit/regtest-toolbox.git")
-            developerConnection.set("scm:git:ssh://git@github.com/thunderbiscuit/regtest-toolbox.git")
+            url.set("https://github.com/kotlin-bitcoin-tools/regtest-toolbox")
+            connection.set("scm:git:git://github.com/kotlin-bitcoin-tools/regtest-toolbox.git")
+            developerConnection.set("scm:git:ssh://git@github.com/kotlin-bitcoin-tools/regtest-toolbox.git")
         }
     }
 }
