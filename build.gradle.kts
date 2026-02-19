@@ -1,9 +1,13 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinJvm
+import com.vanniktech.maven.publish.SourcesJar
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "2.3.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
+    id("org.jetbrains.dokka") version "2.1.0"
     id("com.vanniktech.maven.publish") version "0.36.0"
 }
 
@@ -70,9 +74,14 @@ mavenPublishing {
             developerConnection.set("scm:git:ssh://git@github.com/kotlin-bitcoin-tools/regtest-toolbox.git")
         }
     }
-}
 
-mavenPublishing {
+    configure(
+        KotlinJvm(
+            javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
+            sourcesJar = SourcesJar.Sources(),
+        )
+    )
+
     publishToMavenCentral()
     signAllPublications()
 }
@@ -82,5 +91,24 @@ ktlint {
     ignoreFailures = false
     reporters {
         reporter(ReporterType.PLAIN).apply { outputToConsole = true }
+    }
+}
+
+dokka {
+    moduleName.set("regtest-toolbox")
+    moduleVersion.set(version.toString())
+    dokkaSourceSets.main {
+        includes.from("docs/DOKKA_LANDING.md")
+        samples.from("src/test/kotlin/org/kotlinbitcointools/regtesttoolbox/samples/Samples.kt")
+        sourceLink {
+            localDirectory.set(file("src/main/kotlin"))
+            remoteUrl("https://github.com/kotlin-bitcoin-tools")
+            remoteLineSuffix.set("#L")
+        }
+    }
+    pluginsConfiguration.html {
+        // customStyleSheets.from("styles.css")
+        // customAssets.from("logo.svg")
+        footerMessage.set("(c) Kotlin Bitcoin Tools Developers")
     }
 }

@@ -34,17 +34,7 @@ import kotlinx.serialization.json.buildJsonObject
  * @param walletName Optional wallet name for wallet-specific operations. If provided,
  *                   wallet operations will use the `/wallet/<name>` endpoint.
  *
- * @sample
- * ```kotlin
- * val client = BitcoinClient(
- *     username = "regtest",
- *     password = "password",
- *     walletName = "mywallet"
- * )
- * val address = client.getNewAddress()
- * client.generateBlocks(101, address)
- * client.close()
- * ```
+ * @sample org.kotlinbitcointools.regtesttoolbox.samples.Samples.bitcoinDaemonClient
  */
 class BitcoinClient(
     host: String = "localhost",

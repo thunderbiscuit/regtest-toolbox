@@ -6,6 +6,15 @@
 build:
   ./gradlew build
 
+[doc("Delete all previously built artifacts.")]
+clean:
+  rm -rf build/
+
+[doc("Build Dokka docs.")]
+docs:
+  ./gradlew dokkaGeneratePublicationHtml
+  cd build/dokka/html/ && python3 -m http.server 8000
+
 [doc("Run all tests, unless a specific test is provided.")]
 test *TEST:
   ./gradlew test {{ if TEST == "" { "" } else { "--tests " + TEST } }}
